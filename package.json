@@ -1,7 +1,7 @@
 {
   "name": "dsh-lan-proxy",
   "version": "0.1.0",
-  "description": "DSH web plugin: LAN reverse proxy for the DSH web UI (default 0.0.0.0:15151 -> 127.0.0.1:3080, Host/Origin rewritten to loopback, crypto.randomUUID polyfill injected). Settings namespace dsh-proxy: enabled (default false), host, port.",
+  "description": "DSH web plugin: LAN reverse proxy for the DSH web UI (default 0.0.0.0:15151 -> 127.0.0.1:3080, Host/Origin rewritten to loopback, crypto.randomUUID polyfill injected). Settings namespace dsh-lan-proxy: enabled (default false), host, port.",
   "type": "module",
   "main": "lib/index.js",
   "files": [
