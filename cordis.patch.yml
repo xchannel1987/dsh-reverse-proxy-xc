@@ -1,0 +1,2 @@
+- insert:
+    - {id: lan-proxy, name: 'dsh-lan-proxy'}
