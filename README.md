@@ -16,8 +16,8 @@ cd D:/workspace/dsh-lan-proxy
 npm pack
 dsh plugin --profile web add ./dsh-lan-proxy-0.1.0.tgz
 
-# 或直接 dsh plugin 安装
-dsh plugin --profile web add dsh-lan-proxy
+# 或发布到 registry 后安装（当前尚未 publish，先用上面的 tgz 方式）
+dsh plugin --profile web add dsh-lan-proxy@^0.1.0
 ```
 
 安装后重启 DSH（`dsh --profile web`）。
