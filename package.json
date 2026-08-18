@@ -1,7 +1,7 @@
 {
   "name": "dsh-lan-proxy",
   "version": "0.1.0",
-  "description": "DSH web plugin: configurable LAN reverse proxy for the DSH web UI (default 0.0.0.0:15151 -> 127.0.0.1:3080, Host/Origin rewritten to loopback, crypto.randomUUID polyfill injected). Exposes a settings namespace so the proxy binds only after the user enables it.",
+  "description": "DSH web plugin: LAN reverse proxy for the DSH web UI (default 0.0.0.0:15151 -> 127.0.0.1:3080, Host/Origin rewritten to loopback, crypto.randomUUID polyfill injected). Starts automatically with DSH; mobile/narrow-screen friends can open http://<LAN-IP>:15151 for a full working UI.",
   "type": "module",
   "main": "lib/index.js",
   "files": [
@@ -12,17 +12,6 @@
   "dsh": {
     "bundle": {
       "patch": "./cordis.patch.yml"
-    }
-  },
-  "dependencies": {
-    "schemastery": "^3.18.0"
-  },
-  "peerDependencies": {
-    "@deepseek-ai/dsh-settings": "^0.1.0-rc.6"
-  },
-  "peerDependenciesMeta": {
-    "@deepseek-ai/dsh-settings": {
-      "optional": true
     }
   },
   "license": "MIT"

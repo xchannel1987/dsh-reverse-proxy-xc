@@ -10,8 +10,6 @@ DSH 的 `/api` 有浏览器信任栅栏：只有回环来源的请求才放行�
 - **支持 HTTP 与 WebSocket**（`/api/events.mux` + `/api/events.host` 流式透传）
 - **自动给 HTML 注入 `crypto.randomUUID` polyfill**：DSH 前端在非安全上下文（`http://<LAN-IP>:port`）下 `crypto.randomUUID` 不存在，不注入会抛 "randomUUID is not a function" 导致页面异常（问题根源之一）
 
-实现参考自 `dsh-pocket` 的 `proxy.mjs`（去掉了 tunnel/扫码等无关功能）。
-
 ## 安装
 
 ```bash
@@ -24,7 +22,7 @@ dsh plugin --profile web add ./dsh-lan-proxy-0.1.0.tgz
 
 ## 设置
 
-插件**随 DSH 启动自动运行**（与 dsh-pocket 一致，零配置开箱即用）——安装并重启 DSH 后，代理即监听 `0.0.0.0:15151`。
+插件**随 DSH 启动自动运行**（零配置开箱即用）——安装并重启 DSH 后，代理即监听 `0.0.0.0:15151`。
 
 > 若需修改端口：`lib/index.js` 顶部的 `DEFAULT_PORT`（或重新安装时改 tgz 里的值）。
 
