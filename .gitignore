@@ -3,7 +3,10 @@
 
 # Node
 node_modules/
-*.tgz
 
 # Logs
 *.log
+
+# 本地安装源：profile 注册的是 file:.../dsh-lan-proxy-0.1.0.tgz，
+# 这个 tgz 必须入库（git 管理），否则删了就无法重装插件。
+!dsh-lan-proxy-*.tgz
