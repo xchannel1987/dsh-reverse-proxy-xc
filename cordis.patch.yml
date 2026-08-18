@@ -1,2 +1,4 @@
+# dsh-lan-proxy bundle patch（加载单插件：局域网反向代理）
 - insert:
-    - {id: lan-proxy, name: 'dsh-lan-proxy'}
+    - id: dsh-lan-proxy
+      name: dsh-lan-proxy
