@@ -1,0 +1,9 @@
+# SDD scratch artifacts (briefs, reports, review packages, ledger)
+.superpowers/
+
+# Node
+node_modules/
+*.tgz
+
+# Logs
+*.log
