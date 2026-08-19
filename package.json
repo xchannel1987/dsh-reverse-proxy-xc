@@ -1,17 +1,34 @@
 {
   "name": "dsh-lan-proxy",
   "version": "0.1.0",
-  "description": "DSH web plugin: LAN reverse proxy for the DSH web UI (default 0.0.0.0:15151 -> 127.0.0.1:3080, Host/Origin rewritten to loopback, crypto.randomUUID polyfill injected). Settings namespace dsh-lan-proxy: enabled (default false), host, port.",
+  "description": "DSH web plugin: LAN reverse proxy for the DSH web UI (default 0.0.0.0:15151 -> 127.0.0.1:3080, Host/Origin rewritten to loopback, crypto.randomUUID polyfill injected). Settings namespace dsh-lan-proxy: enabled (default false), host, port, authEnabled, authUser, authPass. Ships a client half: editable config card in the settings Plugins page (client/client.js, built by client/build.mjs).",
   "type": "module",
   "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./client/client.js"
+  },
   "files": [
     "lib",
+    "client",
     "cordis.patch.yml",
     "README.md"
   ],
+  "scripts": {
+    "build:client": "node client/build.mjs"
+  },
   "dsh": {
     "bundle": {
       "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-runtime",
+        "@deepseek-ai/dsh-client-ui-settings",
+        "@deepseek-ai/dsh-client-connection",
+        "@deepseek-ai/dsh-api-remotes"
+      ]
     }
   },
   "dependencies": {
@@ -25,5 +42,8 @@
       "optional": true
     }
   },
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  }
 }
