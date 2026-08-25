@@ -10,7 +10,7 @@ const options = {
   method: 'GET',
   headers: {
     'Accept-Encoding': 'identity',
-    'Authorization': 'Basic ' + Buffer.from('admin:lan-proxy-2026').toString('base64')
+    'Authorization': 'Basic ' + Buffer.from('admin:123456').toString('base64')
   }
 };
 

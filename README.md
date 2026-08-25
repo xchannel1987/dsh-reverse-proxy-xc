@@ -1,4 +1,4 @@
-# dsh-lan-proxy
+# dsh-reverse-proxy-xc
 
 DSH (DeepSeek Harness) web profile 插件：可配置的局域网反向代理，让手机/其他设备在局域网内访问 DSH Web GUI 时获得与本地一致的完整体验（Sidebar / 设置 / 凭据 / 工作区 / 会话全部可用）。
 
@@ -20,9 +20,9 @@ DSH 的 `/api` 有浏览器信任栅栏：只有回环来源的请求才放行�
 ## 安装
 
 ```bash
-cd D:/workspace/dsh-lan-proxy
+cd D:/workspace/dsh-reverse-proxy-xc
 npm pack
-dsh plugin --profile web add ./dsh-lan-proxy-0.1.2.tgz
+dsh plugin --profile web add ./dsh-reverse-proxy-xc-0.1.2.tgz
 ```
 
 安装后重启 DSH（`dsh --profile web`）。

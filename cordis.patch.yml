@@ -1,4 +1,4 @@
-# dsh-lan-proxy bundle patch（加载单插件：局域网反向代理）
+# dsh-reverse-proxy-xc bundle patch（加载单插件：局域网反向代理）
 - insert:
-    - id: dsh-lan-proxy
-      name: dsh-lan-proxy
+    - id: dsh-reverse-proxy-xc
+      name: dsh-reverse-proxy-xc
