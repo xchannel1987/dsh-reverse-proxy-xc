@@ -2,6 +2,13 @@
 
 DSH (DeepSeek Harness) web profile 插件：可配置的局域网反向代理，让手机/其他设备在局域网内访问 DSH Web GUI 时获得与本地一致的完整体验（Sidebar / 设置 / 凭据 / 工作区 / 会话全部可用）。
 
+## 问题修复
+
+本插件修复了通过反代访问时 **模型设置面板无法打开** 的问题：
+
+- **问题根源**：DSH 前端使用 `window.location.hostname` 判断是否是回环环境。通过反代访问时，浏览器地址是 `http://<LAN-IP>:15151`，前端判断 `isLoopback=false`，从而禁用设置面板。
+- **解决方案**：代理层拦截 `/plugins/@deepseek-ai/dsh-client-connection/client.js` 请求，将 `isLoopbackHostname(pageLocation.hostname)` 替换为 `true`，让前端认为在回环环境，启用完整功能。
+
 ## 工作原理
 
 DSH 的 `/api` 有浏览器信任栅栏：只有回环来源的请求才放行特权方法（`settings.describe`、`credentials.describe`、`agentPreset.read` 等），非回环来源一律 403。且前端按页面地址（`window.location.hostname`）判定 `isLoopback`，非回环时 WebSocket 与设置面板会降级。
@@ -15,16 +22,14 @@ DSH 的 `/api` 有浏览器信任栅栏：只有回环来源的请求才放行�
 ```bash
 cd D:/workspace/dsh-lan-proxy
 npm pack
-dsh plugin --profile web add ./dsh-lan-proxy-0.1.0.tgz
+dsh plugin --profile web add ./dsh-lan-proxy-0.1.2.tgz
 ```
 
 安装后重启 DSH（`dsh --profile web`）。
 
 ## 设置
 
-插件**随 DSH 启动自动运行**（零配置开箱即用）——安装并重启 DSH 后，代理即监听 `0.0.0.0:15151`。
-
-> 若需修改端口：`lib/index.js` 顶部的 `DEFAULT_PORT`（或重新安装时改 tgz 里的值）。
+默认**不启用**：装好后在 DSH 设置 →「局域网反向代理」分区打开「启用代理」并保存，代理即在指定 host:port（默认 `0.0.0.0:15151`）监听并热启停；也可通过插件 config（如 `--port`）覆盖默认端口。
 
 ## 使用
 
