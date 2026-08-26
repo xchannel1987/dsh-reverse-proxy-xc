@@ -5,7 +5,7 @@ const http = require('http');
 
 const options = {
   hostname: '127.0.0.1',
-  port: 15151,  // 通过代理端口
+  port: 3090,  // 通过代理端口
   path: '/plugins/@deepseek-ai/dsh-client-connection/client.js',
   method: 'GET',
   headers: {
@@ -13,7 +13,7 @@ const options = {
   }
 };
 
-console.log('Testing via PROXY (port 15151)...');
+console.log('Testing via PROXY (port 3090)...');
 
 const req = http.request(options, (res) => {
   console.log('Status:', res.statusCode);

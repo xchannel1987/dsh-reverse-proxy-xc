@@ -5,7 +5,7 @@ const http = require('http');
 
 const options = {
   hostname: '127.0.0.1',
-  port: 15151,
+  port: 3090,
   path: '/plugins/@deepseek-ai/dsh-client-connection/client.js',
   method: 'GET',
   headers: {
