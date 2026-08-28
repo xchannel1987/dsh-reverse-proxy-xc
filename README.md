@@ -1,5 +1,10 @@
 # dsh-reverse-proxy-xc
 
+[![npm version](https://img.shields.io/npm/v/dsh-reverse-proxy-xc.svg)](https://www.npmjs.com/package/dsh-reverse-proxy-xc)
+[![license](https://img.shields.io/npm/l/dsh-reverse-proxy-xc.svg)](https://github.com/keyiadiannao/dsh-reverse-proxy-xc/blob/main/LICENSE)
+[![downloads](https://img.shields.io/npm/dm/dsh-reverse-proxy-xc.svg)](https://www.npmjs.com/package/dsh-reverse-proxy-xc)
+
+
 DSH (DeepSeek Harness) web profile 插件：可配置的局域网反向代理，让手机/其他设备在局域网内访问 DSH Web GUI 时获得与本地一致的完整体验（Sidebar / 设置 / 凭据 / 工作区 / 会话全部可用）。
 
 ## 问题修复
