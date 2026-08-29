@@ -1,47 +1,106 @@
 # dsh-reverse-proxy-xc
 
 [![npm version](https://img.shields.io/npm/v/dsh-reverse-proxy-xc.svg)](https://www.npmjs.com/package/dsh-reverse-proxy-xc)
-[![license](https://img.shields.io/npm/l/dsh-reverse-proxy-xc.svg)](https://github.com/keyiadiannao/dsh-reverse-proxy-xc/blob/main/LICENSE)
+[![license](https://img.shields.io/npm/l/dsh-reverse-proxy-xc.svg)](https://github.com/xchannel1987/dsh-reverse-proxy-xc/blob/main/LICENSE)
 [![downloads](https://img.shields.io/npm/dm/dsh-reverse-proxy-xc.svg)](https://www.npmjs.com/package/dsh-reverse-proxy-xc)
+[![DSH](https://img.shields.io/badge/DeepSeek-Harness-blue)](https://github.com/deepseek-ai/DeepSeek-Harness)
 
-A configurable LAN reverse proxy for DSH Web GUI, allowing mobile/other devices to access DSH with the same experience as localhost.
+[中文](README.md) | [English](README_EN.md)
 
-## Features
+**DSH LAN Reverse Proxy Plugin** — Seamless access to DSH Web GUI from mobile/tablet devices on your local network with the full desktop experience.
 
-- **Reverse Proxy**: Default `0.0.0.0:3090` → `127.0.0.1:3080`
-- **Host/Origin Rewrite**: Automatically rewrites headers to loopback
-- **crypto.randomUUID Polyfill**: Injected for browser compatibility
-- **Basic Auth Support**: Optional authentication for LAN access
-- **Settings Panel**: Configuration via DSH settings UI
+## ✨ Core Features
 
-## Installation
+### 🌐 Full Feature Access
+- **Sidebar Available**: Workspaces and session list display normally
+- **Settings Panel**: All settings accessible
+- **Credential Management**: API credentials can be managed
+- **WebSocket Support**: Real-time event push works properly
+
+### 🔧 Issue Fixes
+This plugin resolves critical issues when accessing via reverse proxy:
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| Settings panel won't open | Frontend disables on non-loopback | Proxy injects isLoopback=true |
+| randomUUID error | API unavailable under HTTP | Auto-inject polyfill |
+| WebSocket disconnects | Proxy not forwarding correctly | Stream passthrough support |
+
+### 🚀 Technical Implementation
+- **Standalone Server**: Listens on `0.0.0.0:3090` by default
+- **Request Forwarding**: Forwards to DSH main service at `127.0.0.1:3080`
+- **Header Rewriting**: Rewrites Host/Origin to loopback address
+- **HTML Injection**: Auto-injects necessary polyfills
+
+### 🔒 Security Design
+- **LAN Only**: Designed for trusted internal network use
+- **Trust Barrier**: Preserves DSH's original security mechanisms
+- **Configurable**: Disabled by default, requires manual activation
+
+## 📦 Installation
 
 ```bash
+# Using DSH CLI
 dsh plugin --profile web add dsh-reverse-proxy-xc
+
+# Or using npm
+npm install dsh-reverse-proxy-xc
 ```
 
-## Configuration
+Restart DSH after installation.
 
-| Setting | Type | Default | Description |
-|---------|------|---------|-------------|
-| enabled | boolean | true | Enable/disable proxy |
-| host | string | "0.0.0.0" | Listen host |
-| port | number | 3090 | Listen port |
-| authEnabled | boolean | false | Enable basic auth |
-| authUser | string | "" | Auth username |
-| authPass | string | "" | Auth password |
+## ⚙️ Configuration
 
-## Usage
+1. Open DSH Settings
+2. Find "LAN Reverse Proxy" section
+3. Enable "Enable Proxy" toggle
+4. Configure port (default: 3090)
 
-1. Install the plugin
-2. Configure settings in DSH settings panel
-3. Access DSH from other devices via `http://<your-ip>:3090`
+### Configuration Options
 
-## Requirements
+| Option | Default | Description |
+|--------|---------|-------------|
+| enabled | false | Whether to enable proxy |
+| port | 3090 | Listen port |
+| host | 0.0.0.0 | Listen address |
 
-- Node.js >= 18
-- DSH >= 0.1.0-rc.2
+## 🎮 Usage
 
-## License
+1. Ensure target device and host are on the same LAN or VPN
+2. Access from target device browser:
+
+```
+http://<host-lan-ip>:3090
+```
+
+Example: `http://10.100.50.125:3090`
+
+3. Enjoy the same experience as local `http://127.0.0.1:3080`
+
+## 🔧 How It Works
+
+```
+Mobile Browser
+    ↓ HTTP/WS
+Reverse Proxy (0.0.0.0:3090)
+    ↓ Rewrite Headers
+DSH Main Service (127.0.0.1:3080)
+    ↓ Treats as loopback access
+Full features unlocked
+```
+
+## ⚠️ Security Notes
+
+- **Don't Expose to Internet**: This plugin is designed for trusted internal networks
+- **VPN Recommended**: Use VPN for cross-network access
+- **Sensitive Operations**: Involves credentials and settings, ensure network security
+
+## 📄 License
 
 [MIT](LICENSE)
+
+## 🔗 Links
+
+- [GitHub](https://github.com/xchannel1987/dsh-reverse-proxy-xc)
+- [npm](https://www.npmjs.com/package/dsh-reverse-proxy-xc)
+- [Issues](https://github.com/xchannel1987/dsh-reverse-proxy-xc/issues)
