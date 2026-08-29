@@ -39,12 +39,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/keyiadiannao/dsh-reverse-proxy-xc.git"
+    "url": "git+https://github.com/xchannel1987/dsh-reverse-proxy-xc.git"
   },
   "bugs": {
-    "url": "https://github.com/keyiadiannao/dsh-reverse-proxy-xc/issues"
+    "url": "https://github.com/xchannel1987/dsh-reverse-proxy-xc/issues"
   },
-  "homepage": "https://github.com/keyiadiannao/dsh-reverse-proxy-xc#readme",
+  "homepage": "https://github.com/xchannel1987/dsh-reverse-proxy-xc#readme",
   "publishConfig": {
     "access": "public"
   },
