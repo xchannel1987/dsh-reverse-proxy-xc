@@ -1,6 +1,6 @@
 {
   "name": "dsh-reverse-proxy-xc",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "DSH web plugin: LAN reverse proxy for the DSH web UI (default 0.0.0.0:3090 -> 127.0.0.1:3080, Host/Origin rewritten to loopback, crypto.randomUUID polyfill injected). Settings namespace dsh-reverse-proxy-xc: enabled, host, port, authEnabled, authUser, authPass. Ships a hand-written client half (lib/client.js): a settings.section config panel.",
   "type": "module",
   "main": "lib/index.js",

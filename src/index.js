@@ -19,7 +19,6 @@
 //    helper（dsh-power-button / dsh-version-update）等旧进程消失等不到而放弃，
 //    表现为"dsh 关了但 lan-proxy 端口还占着"，重启直接失败。
 import z from 'schemastery';
-import { settingsNamespace } from '@deepseek-ai/dsh-settings';
 import { createLanProxy } from './proxy.js';
 
 export const name = 'dsh-reverse-proxy-xc';
@@ -114,7 +113,7 @@ export function apply(ctx, config = {}) {
   // 按开关启停：改设置即热启停（applies: 'live'）。config（cordis 插件配置，
   // 如 --port 覆盖）优先于 schema 默认值。
   ctx.inject(['settings'], (sctx) => {
-    const scope = sctx.settings.register(settingsNamespace(NS), ProxySchema, {
+    const scope = sctx.settings.register(NS, ProxySchema, {
       applies: 'live',
       base: {
         enabled: typeof config.enabled === 'boolean' ? config.enabled : undefined,
