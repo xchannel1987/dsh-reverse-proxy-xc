@@ -139,6 +139,25 @@ function loopbackAuthority(headers, upstream) {
   return out;
 }
 
+/** 新 DSH (0.1.2-alpha.3) 的浏览器会话 cookie 名：dsh-auth-<sha256(authority) base64url>。
+ *  与 @deepseek-ai/dsh-client-connection 的 cookieName() 完全一致，用于判断
+ *  代理链路是否已持有 loopback authority 的鉴权 cookie。 */
+function loopbackAuthCookieName(upstream) {
+  const authority = `${upstream.host}:${upstream.port}`;
+  return 'dsh-auth-' + createHash('sha256').update(authority).digest('base64url');
+}
+
+/** 请求 Cookie 中是否已携带指定名（authority 绑定）的会话 cookie。 */
+function cookieHas(rawCookie, name) {
+  if (!rawCookie) return false;
+  for (const part of String(rawCookie).split(';')) {
+    const eq = part.indexOf('=');
+    const n = eq === -1 ? part.trim() : part.slice(0, eq).trim();
+    if (n === name) return true;
+  }
+  return false;
+}
+
 /**
  * Start the LAN proxy.
  * @param {object} opts
@@ -150,10 +169,12 @@ function loopbackAuthority(headers, upstream) {
  * @param {{enabled:boolean,user:string,pass:string}} [opts.auth] - optional Basic-auth gate.
  * @returns {Promise<{server:import('node:http').Server, port:number, close:()=>Promise<void>}>}
  */
-export function createLanProxy({ port = 3090, host = '0.0.0.0', upstream = DEFAULT_UPSTREAM, log = null, injectHtml = RANDOM_UUID_POLYFILL, auth = null } = {}) {
+export function createLanProxy({ port = 3090, host = '0.0.0.0', upstream = DEFAULT_UPSTREAM, log = null, injectHtml = RANDOM_UUID_POLYFILL, auth = null, getLaunchToken = null } = {}) {
   // token 由固定盐 + user:pass 确定性签出，跨进程/重启稳定：
   // 已签发的 cookie 在 DSH 重启后依然有效，无需重新认证。
   const sign = makeSigner();
+  // 新 DSH 鉴权：loopback authority 的浏览器会话 cookie 名（与上游一致）。
+  const authCookieName = loopbackAuthCookieName(upstream);
   const server = createServer((req, res) => {
     // 认证闸门（HTTP）
     const gate = checkAuth(req, auth, sign);
@@ -162,6 +183,20 @@ export function createLanProxy({ port = 3090, host = '0.0.0.0', upstream = DEFAU
     const headers = loopbackAuthority({ ...req.headers }, upstream);
     // 凭据只在代理层校验，不转发给上游（避免 Basic 明文进入 dsh web 进程/日志）。
     if (auth?.enabled) delete headers.authorization;
+
+    // 新 DSH (0.1.2-alpha.3) 鉴权：首页请求（GET/HEAD /）在尚未持有 loopback
+    // authority 的会话 cookie 时，附加启动令牌，让上游 webServer 签发
+    // dsh-auth-<authority> cookie；此后浏览器自带 cookie，代理不再附令牌。
+    let proxyPath = req.url;
+    const launchToken = typeof getLaunchToken === 'function' ? getLaunchToken() : null;
+    const method = String(req.method || 'GET').toUpperCase();
+    if (launchToken && (method === 'GET' || method === 'HEAD')) {
+      const u = new URL(req.url, 'http://dsh.invalid');
+      if ((u.pathname === '/' || u.pathname === '') && !cookieHas(req.headers.cookie, authCookieName)) {
+        u.searchParams.set('token', launchToken);
+        proxyPath = u.pathname + u.search;
+      }
+    }
 
     // 检查是否是 client-connection bundle 请求，需要 patch
     const isBundle = isClientConnectionBundle(req.url);
@@ -172,7 +207,7 @@ export function createLanProxy({ port = 3090, host = '0.0.0.0', upstream = DEFAU
     }
 
     const proxyReq = httpRequest(
-      { host: upstream.host, port: upstream.port, method: req.method, path: req.url, headers, agent: false },
+      { host: upstream.host, port: upstream.port, method: req.method, path: proxyPath, headers, agent: false },
       (proxyRes) => {
         // 首次 Basic 验证成功：认证 cookie 以 Set-Cookie 响应头随上游真实内容
         // 一起下发，浏览器落地即进入真实页面。此前用 200 + "ok" 占位短路，导致

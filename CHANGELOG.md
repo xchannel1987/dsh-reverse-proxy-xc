@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.1.4] - 2026-09-01
+
+### Fixed
+- 适配新 DSH 鉴权：转发启动令牌换取 authority 绑定 cookie。
+
 ## [0.1.3] - 2026-09-01
 
 ### Fixed

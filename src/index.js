@@ -56,6 +56,13 @@ export function apply(ctx, config = {}) {
   // 端口导致的自我 EADDRINUSE，也防旧重试在配置变更后再冒出来抢占）。
   let seq = 0;
   let retryTimer = null; // 延迟重试的 setTimeout 句柄
+  // 新 DSH (0.1.2-alpha.3) 鉴权：从 connection 服务读取启动令牌（browserAuth.launchToken），
+  // 由代理在首页请求附上换取 authority 绑定 cookie。connection 是可选服务：
+  // 拿不到令牌时按旧行为工作（代理仍转发，但不做令牌交换）。
+  let launchToken = null;
+  ctx.inject(['connection'], (c) => {
+    launchToken = (c.connection && c.connection.browserAuth && c.connection.browserAuth.launchToken) || null;
+  });
 
   function clearRetry() {
     if (retryTimer) { clearTimeout(retryTimer); retryTimer = null; }
@@ -85,6 +92,7 @@ export function apply(ctx, config = {}) {
           user: v.authUser,
           pass: v.authPass,
         },
+        getLaunchToken: () => launchToken,
       });
       if (mySeq !== seq) { await p.close().catch(() => {}); return; } // 绑定期间被新 sync 取代
       proxy = p;
