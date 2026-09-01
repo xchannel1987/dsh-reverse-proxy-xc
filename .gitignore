@@ -7,9 +7,8 @@ node_modules/
 # Logs
 *.log
 
-# 本地安装源：profile 注册的是 file:.../dsh-reverse-proxy-xc-0.1.0.tgz，
-# 这个 tgz 必须入库（git 管理），否则删了就无法重装插件。
-!dsh-reverse-proxy-xc-*.tgz
+# npm 包：tgz 不入 git 仓库（本地保留供 profile 的 file: 引用，重装插件需要本地文件）
+*.tgz
 
 # Claude AI 助手项目级规则（不入库）
 CLAUDE.md
