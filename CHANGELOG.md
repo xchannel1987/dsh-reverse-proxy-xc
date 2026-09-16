@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.1.6] - 2026-09-16
+
+### Added
+- 新增 `bypassToken` 配置项（默认开启）：反向代理在转发 HTTP 与 WebSocket 流量时自动在请求头注入合法的 loopback 会话凭证（`dsh-auth-*`），手机及远程设备访问免去输入启动 Token，彻底解决页面提示 `dsh web authentication required` 的问题。
+- 在 Web 设置面板（`lib/client.js`）中增加「免 Token 认证」复选框设置项。
+
+### Fixed
+- 修复手机端携带失效旧 Cookie 时代理不再附加 Token 导致持续 401 拦截的死循环缺陷。
+- 修复 WebSocket upgrade 时可能冲掉原有 Cookie 导致握手 401 的缺陷。
+
 ## [0.1.5] - 2026-09-08
 
 ### Added

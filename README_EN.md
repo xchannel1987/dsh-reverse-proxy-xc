@@ -25,6 +25,7 @@ This plugin resolves critical issues when accessing via reverse proxy:
 | Settings panel won't open | Frontend disables on non-loopback | Proxy injects isLoopback=true |
 | randomUUID error | API unavailable under HTTP | Auto-inject polyfill |
 | WebSocket disconnects | Proxy not forwarding correctly | Stream passthrough support |
+| authentication required prompt | Mobile access lacks launch token | Auto-acquire and inject valid session cookie (bypassToken) |
 
 ### 🚀 Technical Implementation
 - **Standalone Server**: Listens on `0.0.0.0:3090` by default
@@ -63,6 +64,10 @@ Restart DSH after installation.
 | enabled | false | Whether to enable proxy |
 | port | 3090 | Listen port |
 | host | 0.0.0.0 | Listen address |
+| bypassToken | true | Bypass Token Auth (auto-inject valid session cookie, no launch token required) |
+| authEnabled | false | Whether to enable Basic access authentication |
+| authUser | admin | Auth username |
+| authPass | 123456 | Auth password |
 
 ## 🎮 Usage
 

@@ -25,6 +25,7 @@
 | 设置面板无法打开 | 前端判断非回环环境禁用 | 代理层注入 isLoopback=true |
 | randomUUID 报错 | HTTP 下 API 不可用 | 自动注入 polyfill |
 | WebSocket 断开 | 代理未正确转发 | 流式透传支持 |
+| 提示 authentication required | 移动端访问缺少启动 token 凭证 | 自动换取并注入合法 session cookie (bypassToken) |
 
 ### 🚀 技术实现
 - **独立服务**：默认监听 `0.0.0.0:3090`
@@ -63,6 +64,10 @@ npm install dsh-reverse-proxy-xc
 | enabled | false | 是否启用代理 |
 | port | 3090 | 监听端口 |
 | host | 0.0.0.0 | 监听地址 |
+| bypassToken | true | 免 Token 认证（反代流量自动注入本机凭据，手机访问免输启动 Token） |
+| authEnabled | false | 是否启用访问认证（Basic） |
+| authUser | admin | 认证用户名 |
+| authPass | 123456 | 认证密码 |
 
 ## 🎮 使用
 
