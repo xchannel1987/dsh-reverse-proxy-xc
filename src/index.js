@@ -49,17 +49,39 @@ const ProxySchema = z.object({
 /** 0.1.7：宿主插件导出的 Config 声明设置命名空间（id = profile 条目 id）。 */
 export const Config = ProxySchema;
 
+/**
+ * 解包 volatile 字段引用：schemastery >= 3.18.4 把标了 `.extra('volatile', true)`
+ * 的字段的「解析后值」包成不可变引用（官方插件写 `this.config.x.get()`），
+ * 3.18.1 则是普通值。两种都归一化为普通值。
+ *
+ * 关键：apply(ctx, config) 收到的 config 是「经 Config schema 解析过」的值，
+ * 故 volatile 字段是引用对象而非普通值。不解包会导致
+ * `input.enabled === true` 恒为 false、`Number(input.port)` 恒为 NaN 回落默认
+ * 3090，表现为插件静默不生效（不监听端口、不报错、无任何日志）。
+ */
+function readField(value) {
+  return value !== null && typeof value === 'object' && typeof value.get === 'function' ? value.get() : value;
+}
+
+/** 归一化整份配置为普通值对象（逐字段解包 volatile 引用；普通对象原样返回）。 */
+function readConfig(config) {
+  const out = {};
+  for (const key of Object.keys(config ?? {})) out[key] = readField(config[key]);
+  return out;
+}
+
 /** 归一化一份配置（apply 的 config 或控制路由 payload）为运行参数。 */
 function normalizeConfig(input = {}) {
-  const port = Number(input.port);
+  const plain = readConfig(input);
+  const port = Number(plain.port);
   return {
-    enabled: input.enabled === true,
-    host: String(input.host || '0.0.0.0').trim() || '0.0.0.0',
+    enabled: plain.enabled === true,
+    host: String(plain.host || '0.0.0.0').trim() || '0.0.0.0',
     port: Number.isInteger(port) && port >= 1 && port <= 65535 ? port : 3090,
-    authEnabled: input.authEnabled === true,
-    authUser: String(input.authUser ?? ''),
-    authPass: String(input.authPass ?? ''),
-    bypassToken: input.bypassToken !== false,
+    authEnabled: plain.authEnabled === true,
+    authUser: String(plain.authUser ?? ''),
+    authPass: String(plain.authPass ?? ''),
+    bypassToken: plain.bypassToken !== false,
   };
 }
 
@@ -78,6 +100,9 @@ export function apply(ctx, config = {}) {
   let retryTimer = null; // 延迟重试的 setTimeout 句柄
   // 当前生效的运行参数（初始来自 apply 的 config；之后由控制路由更新）。
   let current = normalizeConfig(config);
+  // 把「解析后的实际运行参数」打出来：这是本插件过去唯一会静默失效的环节
+  // （配置没读对 → enabled=false → 不监听、不报错、无日志），显式留痕。
+  logger.info(`[dsh-reverse-proxy-xc] config resolved: enabled=${current.enabled} host=${current.host} port=${current.port} auth=${current.authEnabled} bypassToken=${current.bypassToken} | 已解析运行参数`);
   // 启动令牌：从 connection 服务读取（browserAuth.launchToken），由代理在首页
   // 请求附上或注入 loopback session cookie 换取 authority 绑定。connection 是
   // 可选服务：拿不到令牌时按旧行为工作（代理仍转发，但不做令牌交换）。

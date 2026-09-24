@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.1.8] - 2026-09-24
+
+### Fixed
+- **修复设置项全部失效（插件静默不生效：不监听端口、不报错、无日志）**：
+  0.1.7 起 `apply(ctx, config)` 收到的 config 是**经 `Config` schema 解析后**的值，
+  而 schemastery **>= 3.18.4** 会把标了 `.extra('volatile', true)` 的字段包成
+  不可变引用 `{ get(), [write] }`（官方插件写法是 `this.config.x.get()`）。
+  旧代码直接读 `input.enabled === true` / `Number(input.port)` 全部落空：
+  `enabled` 恒为 `false`、`port` 恒为 `NaN` 回落默认 3090 —— 于是启动时
+  `sync()` 判定为「不启用」，直接 return，端口永不监听。
+  现在新增 `readField()` / `readConfig()` 逐字段解包（兼容 3.18.1 的普通值形态
+  与未知字段），`normalizeConfig()` 先摊平再取值。
+- 新增启动日志 `config resolved: enabled=… host=… port=…`：把上述「静默失效」
+  环节显式留痕，便于日后一眼定位配置未生效的问题。
+- 新增回归测试 `_fixcheck.mjs`：喂入 volatile 包装后的 config，断言代理真正绑定
+  端口且 disposer 后释放。
+
+### Chore
+- **工程化规范化：补回构建脚本 + 修复 `src/` 落后一个版本的漂移**（无运行时改动，运行时行为不受影响）：
+  - 新增 `build.ps1`，对齐 `dsh-session-xc` / `dsh-token-usage-xc` / `dsh-notify-xc` 同族插件的仓库约定：以 `lib/` 为准校验并同步 `src/`，然后 `npm pack`；`-NoSync` 只校验、发现漂移即报错退出，供 CI 与发布前把关。**只清理「当前版本」的同名 tgz**，历史版本一律保留（profile 的 `file:` 依赖可能正指向旧版本文件，删掉会打断依赖解析）。
+  - **修复 `src/` 与 `lib/` 的版本漂移**：0.1.6 的 `bypassToken` 免 Token 特性（`lib/proxy.js` 137 行、`lib/proxy.test.mjs`）当年只落在 `lib/`，`src/` 未同步。现已以 `lib/` 为准同步，`index.js` / `client.js` / `proxy.js` / `proxy.test.mjs` 四个文件与 `lib/` 逐字节一致。
+  - CI（`.github/workflows/ci.yml`）改为统一模板：`lib/` 产物存在性 + `src/` ↔ `lib/` 逐字节一致性门禁 + 单元测试步骤（`node --test`）。
+  - `CLAUDE.md` 更正 `src/`、`lib/` 的权威关系（`lib/` 为权威主本、`src/` 为同源镜像）与构建/安装流程。
+
 ## [0.1.7] - 2026-09-24
 
 ### Fixed
