@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.1.7] - 2026-09-24
+
+### Fixed
+- **适配 DSH 0.1.7（本版本前在 0.1.7 上无法加载/无法配置）**：
+  - 修复模块加载崩溃：`import z from 'schemastery'`（无前缀包不可解析，`MODULE_NOT_FOUND`）
+    → 改用 `@deepseek-ai/schemastery` 并在 package.json 声明依赖。
+  - 设置接口迁移：`ctx.settings.register()` 已在 0.1.7 移除 → 改由宿主导出 `Config`
+    （各字段标 `volatile` 以投影到设置页），配置值经 `apply(ctx, config)` 注入。
+  - 启停改为「控制路由」驱动：客户端保存后 POST `/api/dsh-reverse-proxy-xc/control`
+    （`connection.fetch.register` 精确路由，复用官方 /api 认证围栏）热启停代理；客户端设置
+    服务 `settingsScope` → `configForms`。
+- `engines.dsh`：`>=0.1.2-alpha.3` → `>=0.1.7-rc.1`。
+
 ## [0.1.6] - 2026-09-16
 
 ### Added

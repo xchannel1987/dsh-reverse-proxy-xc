@@ -9,6 +9,8 @@
 
 **DSH LAN Reverse Proxy Plugin** — Seamless access to DSH Web GUI from mobile/tablet devices on your local network with the full desktop experience.
 
+> **DSH 0.1.7 compatible (`>=0.1.7-rc.1`)**: adapted to the 0.1.7 breaking changes (`ctx.settings.register` removed, client service `settingsScope` → `configForms`). Settings stay under Settings → LAN Reverse Proxy; saving hot-restarts the proxy via the `/api/dsh-reverse-proxy-xc/control` route.
+
 ## ✨ Core Features
 
 ### 🌐 Full Feature Access

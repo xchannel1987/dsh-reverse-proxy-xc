@@ -2,10 +2,11 @@
 //
 // 与 DSH 内置客户端插件同构：window.__ModuleLoader__.load({ id, factory })。
 // 只 require() 平台静态模块（react），其余协作全部走 cordis 服务注入
-// （connection / slots / settingsScope）。
+// （connection / slots / configForms）。
 //
 // 展示：设置页新增分区「局域网反向代理」（settings.section）——enabled/host/port
-// authEnabled/authUser/authPass 六字段编辑表单，保存逐字段写 host settings。
+// authEnabled/authUser/authPass 六字段编辑表单，保存逐字段写 host settings，再经
+// /api/dsh-reverse-proxy-xc/control 控制路由让宿主热启停（DSH>=0.1.7）。
 window.__ModuleLoader__.load({
   id: "dsh-reverse-proxy-xc",
   factory: (require) => {
@@ -26,6 +27,7 @@ window.__ModuleLoader__.load({
       authEnabled: false,
       authUser: "admin",
       authPass: "123456",
+      bypassToken: true,
     };
 
     function currentValues(snapshot) {
@@ -38,6 +40,7 @@ window.__ModuleLoader__.load({
         authEnabled: typeof raw.authEnabled === "boolean" ? raw.authEnabled : DEFAULTS.authEnabled,
         authUser: typeof raw.authUser === "string" ? raw.authUser : DEFAULTS.authUser,
         authPass: typeof raw.authPass === "string" ? raw.authPass : DEFAULTS.authPass,
+        bypassToken: typeof raw.bypassToken === "boolean" ? raw.bypassToken : DEFAULTS.bypassToken,
       };
     }
 
@@ -139,11 +142,24 @@ window.__ModuleLoader__.load({
           authEnabled: !!draft.authEnabled,
           authUser: String(draft.authUser || ""),
           authPass: String(draft.authPass || ""),
+          bypassToken: draft.bypassToken !== false,
         };
         var all = Object.keys(fields).map(function (f) { return scope.set(f, fields[f]); });
         Promise.all(all).then(function () {
           setDirty(false);
-          setStatus("已保存，端口/认证变更即时生效。");
+          setStatus("正在热启停代理…");
+          // DSH >= 0.1.7：宿主插件不再 watch 设置，需显式经控制路由热启停
+          //（/api/dsh-reverse-proxy-xc/control，复用官方 /api 认证围栏）。
+          fetch("/api/dsh-reverse-proxy-xc/control", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify(fields),
+          }).then(function (res) {
+            if (res.ok) setStatus("已保存，代理已按新配置热启停。");
+            else setError("已保存，但代理热启停失败（HTTP " + res.status + "）。");
+          }).catch(function () {
+            setError("已保存，但代理热启停失败（网络错误）。");
+          });
         }).catch(function (err) {
           setStatus(null);
           setError("保存失败：" + (err && err.message ? err.message : String(err)));
@@ -166,6 +182,7 @@ window.__ModuleLoader__.load({
         React.createElement(Checkbox, { field: "enabled", label: "启用代理（关闭时不监听任何端口）", value: draft.enabled, writable: writable, onChange: function (v) { setField("enabled", v); } }),
         React.createElement(Field, { field: "host", label: "监听地址 (host)", value: draft.host, writable: writable, onChange: function (v) { setField("host", v); } }),
         React.createElement(Field, { field: "port", label: "监听端口 (port)", value: portText, numeric: true, writable: writable, onChange: function (v) { setPortText(v); setDirty(true); setError(null); } }),
+        React.createElement(Checkbox, { field: "bypassToken", label: "免 Token 认证（反代流量自动注入本机凭据，手机免输启动 Token）", value: draft.bypassToken, writable: writable, onChange: function (v) { setField("bypassToken", v); } }),
         React.createElement("hr", { style: st.sep }),
         React.createElement(Checkbox, { field: "authEnabled", label: "启用访问认证（Basic）", value: draft.authEnabled, writable: writable, onChange: function (v) { setField("authEnabled", v); } }),
         React.createElement(Field, { field: "authUser", label: "认证用户名", value: draft.authUser, writable: writable, onChange: function (v) { setField("authUser", v); } }),
@@ -178,11 +195,17 @@ window.__ModuleLoader__.load({
       );
     }
 
-    var inject = ["connection", "slots", "settingsScope"];
+    var inject = ["connection", "slots", "configForms"];
 
     function apply(ctx) {
-      var scope = ctx.settingsScope.bind({ namespace: NS });
-      // 设置页新增分区
+      // DSH >= 0.1.7：settingsScope 服务更名为 configForms，get(namespace) 直接
+      // 返回同形态命名空间 scope（getSnapshot / set / subscribe / writable）。
+      var scope = ctx.configForms && typeof ctx.configForms.get === "function"
+        ? ctx.configForms.get(NS)
+        : (ctx.get && typeof ctx.get === "function" && ctx.get("configForms") && ctx.get("configForms").get)
+          ? ctx.get("configForms").get(NS)
+          : null;
+      // 设置页新增分区（settings.section 整页，0.1.7 保留的挂载点）
       ctx.slots.inject("settings.section", function () {
         return ctx.slots.register({
           name: "settings.section",

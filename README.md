@@ -9,6 +9,11 @@
 
 **DSH 局域网反向代理插件** —— 让手机/平板等设备在局域网内无缝访问 DSH Web GUI，获得与本地完全一致的体验。
 
+> **DSH 0.1.7 兼容（`>=0.1.7-rc.1`）**：0.1.7 起设置接口与客户端设置服务均有 breaking
+> 变更（`ctx.settings.register` 移除、`settingsScope` 更名 `configForms`），本版本已完整适配：
+> 设置入口位于「设置」页的「局域网反向代理」分区；保存后经控制路由
+> `/api/dsh-reverse-proxy-xc/control` 立即热启停代理（含端口/认证变更）。
+
 ## ✨ 核心特性
 
 ### 🌐 完整功能访问
