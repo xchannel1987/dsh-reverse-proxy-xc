@@ -197,6 +197,12 @@ window.__ModuleLoader__.load({
 
     var inject = ["connection", "slots", "configForms"];
 
+    /** 设置菜单图标：地球（局域网反向代理）。官方图标库组件按需 require。 */
+    function SettingsMenuIcon(props) {
+      var Primitives = require("@deepseek-ai/dsh-client-ui-primitives");
+      return React.createElement(Primitives.IconGlobeOutlineMedium, { size: (props && props.size) || 16 });
+    }
+
     function apply(ctx) {
       // DSH >= 0.1.7：settingsScope 服务更名为 configForms，get(namespace) 直接
       // 返回同形态命名空间 scope（getSnapshot / set / subscribe / writable）。
@@ -214,6 +220,14 @@ window.__ModuleLoader__.load({
           label: function () { return "局域网反向代理"; },
           inject: function () { return { scope: scope }; },
         }, LanProxySection);
+      });
+
+      // 设置菜单图标（settings.section.icon）：覆盖默认齿轮，改用地球图标。
+      ctx.slots.inject("settings.section.icon", function () {
+        return ctx.slots.register({
+          name: "settings.section.icon",
+          id: "dsh-reverse-proxy-xc",
+        }, SettingsMenuIcon);
       });
     }
 
